@@ -1,4 +1,5 @@
 import Product from "../models/Product.js"
+import mongoose from "mongoose";
 
 export const getProducts = async (_, res) => {
     try {
@@ -29,7 +30,7 @@ export const getProductByID = async (req, res) => {
                 message: "Invalid Product ID"
             });
         }
-        
+
         const product = await Product.findById(id);
 
         if (!product) {
@@ -50,5 +51,47 @@ export const getProductByID = async (req, res) => {
             success: false,
             message: error.message || "Internal Server Error"
         })
+    }
+}
+
+// product creater
+export const createProduct = async (req, res) => {
+
+    const { productName, description, price, stockQuantity } = req.body;
+
+    try {
+
+        const existingProduct = await Product.findOne({ productName });
+
+        if (existingProduct) {
+            existingProduct.stockQuantity += stockQuantity;
+
+            await existingProduct.save();
+
+            return res.status(200).json({
+                success: true,
+                message: "Stock updated"
+            });
+        }
+
+
+        const product = await Product.create({
+            productName,
+            description,
+            price,
+            stockQuantity
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Product created successfully",
+            product
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
     }
 }
