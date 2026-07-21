@@ -95,3 +95,27 @@ export const login = async (req, res) => {
     }
 }
 
+export const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({});
+
+        return res.status(200).json({
+            success: true,
+            message: "All Users fetched",
+            users: users ? users : []
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        })
+    }
+}
+
+export const getMe = (req, res) => {
+    return res.status(200).json({
+        success: true,
+        user: req.user
+    });
+
+}
