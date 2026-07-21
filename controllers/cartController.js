@@ -75,3 +75,128 @@ export const addToCart = async (req, res) => {
     }
 };
 
+export const updateCart = async (req, res) => {
+
+    try {
+        const userId = req.user._id;
+        const { productId } = req.params;
+        const { quantity } = req.body;
+
+        if (!quantity || quantity < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "Quantity must be greater than 0"
+            });
+        }
+
+        const cart = await Cart.findOne({
+            user: userId
+        });
+
+        if (!cart) {
+            return res.status(404).json({
+                success: false,
+                message: "Cart not found"
+            });
+        }
+
+        // find product in cart
+        const item = cart.items.find((item) => item.product.equals(productId));
+
+        if (!item) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in cart"
+            });
+        }
+
+        // Update quantity
+        item.quantity = quantity;
+
+        // save changes
+        await cart.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Cart updated successfully",
+            cart
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
+    }
+}
+
+export const deleteCartItem = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { productId } = req.params;
+
+        const cart = await Cart.findOne({ user: userId });
+
+        if (!cart) {
+            return res.status(404).json({
+                success: false,
+                message: "Cart not found"
+            });
+        }
+
+        const item = cart.items.find(item =>
+            item.product.equals(productId)
+        );
+
+        if (!item) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found in cart"
+            });
+        }
+
+        // Remove the item from the array
+        cart.items = cart.items.filter(
+            item => !item.product.equals(productId)
+        );
+
+        await cart.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Product removed from cart successfully",
+            cart
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
+    }
+};
+
+export const getCart = async (req, res) => {
+    try {
+        const userId = req.user._id;
+
+        const cart = await Cart.findOne({ user: userId }).populate("items.product");
+        if (!cart) {
+            return res.status(404).json({
+                success: false,
+                message: "Cart is empty"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Cart fetched",
+            cart
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        })
+    }
+}

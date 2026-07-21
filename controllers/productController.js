@@ -1,6 +1,7 @@
 import Product from "../models/Product.js"
 import mongoose from "mongoose";
 
+// product getter
 export const getProducts = async (_, res) => {
     try {
         const products = await Product.find();
@@ -19,11 +20,13 @@ export const getProducts = async (_, res) => {
         });
     }
 }
-
+// product getter by id
 export const getProductByID = async (req, res) => {
     try {
+        // desstructure the id from params
         const { id } = req.params;
 
+        // check if the id is valid object or not?
         if (!mongoose.isValidObjectId(id)) {
             return res.status(400).json({
                 success: false,
@@ -31,8 +34,10 @@ export const getProductByID = async (req, res) => {
             });
         }
 
+        // find the product by id 
         const product = await Product.findById(id);
 
+        // only if product not found 
         if (!product) {
             return res.status(404).json({
                 success: false,
@@ -40,6 +45,7 @@ export const getProductByID = async (req, res) => {
             });
         }
 
+        // after prodcut found sends this status
         return res.status(200).json({
             success: true,
             message: `Product with id ${id} fetched successfully`,
