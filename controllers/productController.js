@@ -4,9 +4,10 @@ import mongoose from "mongoose";
 // product getter
 export const getProducts = async (_, res) => {
     try {
+        // find the products
         const products = await Product.find();
 
-
+        // sends this response back after success
         return res.status(200).json({
             success: true,
             message: "Products are fetched successfully",
@@ -20,10 +21,11 @@ export const getProducts = async (_, res) => {
         });
     }
 }
+
 // product getter by id
 export const getProductByID = async (req, res) => {
     try {
-        // desstructure the id from params
+        // destructure the id from params
         const { id } = req.params;
 
         // check if the id is valid object or not?
@@ -45,7 +47,7 @@ export const getProductByID = async (req, res) => {
             });
         }
 
-        // after prodcut found sends this status
+        // after product found sends this status
         return res.status(200).json({
             success: true,
             message: `Product with id ${id} fetched successfully`,
@@ -63,10 +65,12 @@ export const getProductByID = async (req, res) => {
 // product creater
 export const createProduct = async (req, res) => {
 
+    // destructure the values from req.body
     const { productName, description, price, stockQuantity } = req.body;
 
     try {
 
+        // check if product is already exists or not
         const existingProduct = await Product.findOne({ productName });
 
         if (existingProduct) {
@@ -80,7 +84,7 @@ export const createProduct = async (req, res) => {
             });
         }
 
-
+        // if product is not exists then create one 
         const product = await Product.create({
             productName,
             description,
@@ -88,6 +92,7 @@ export const createProduct = async (req, res) => {
             stockQuantity
         });
 
+        // sends this response after success
         return res.status(201).json({
             success: true,
             message: "Product created successfully",
