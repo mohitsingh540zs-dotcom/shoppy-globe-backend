@@ -113,8 +113,10 @@ export const login = async (req, res) => {
 //get all user controller
 export const getAllUsers = async (_, res) => {
     try {
+        // gives back all the users data 
         const users = await User.find({});
 
+        // triggers after success
         return res.status(200).json({
             success: true,
             message: "All Users fetched",

@@ -106,3 +106,88 @@ export const createProduct = async (req, res) => {
         });
     }
 }
+
+// edit product
+export const updateProduct = async (req, res) => {
+    const { productName, description, price, stockQuantity } = req.body;
+
+    try {
+        const { id } = req.params;
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Product ID"
+            });
+        }
+
+        const updatedData = {
+            productName,
+            description,
+            price,
+            stockQuantity
+        }
+
+        const updateProduct = await Product.findByIdAndUpdate(
+            id,
+            updatedData,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!updateProduct) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Product updated successfully",
+            product: updateProduct
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
+    }
+}
+
+// delete product
+export const deleteProduct = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid Product Id"
+            });
+        }
+
+        const product = await Product.findByIdAndDelete(id);
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Product deleted successfully"
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Internal Server Error"
+        });
+    }
+}
