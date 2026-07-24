@@ -1,4 +1,4 @@
-const validator = (req, res, next) => {
+export const productValidator = (req, res, next) => {
 
     // destruct the values from req body
     const { productName, description, price, stockQuantity } = req.body;
@@ -14,4 +14,15 @@ const validator = (req, res, next) => {
     next();
 }
 
-export default validator;
+export const authvalidator = (req, res, next) => {
+    const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required"
+        });
+    }
+
+    next();
+}

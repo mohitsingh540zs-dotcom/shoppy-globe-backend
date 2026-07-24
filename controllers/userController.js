@@ -9,6 +9,7 @@ export const register = async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
 
     try {
+
         // find the user by email
         const user = await User.findOne({ email });
 
@@ -32,15 +33,15 @@ export const register = async (req, res) => {
         });
 
         // creates a safeUser object using user Object
-        const safeuser = user.toObject();
+        const safeUser = newUser.toObject();
         // delete the password property from it and send back as user response
-        delete safeuser.password;
+        delete safeUser.password;
 
         // sends back this response after success
         return res.status(201).json({
             success: true,
             message: "User created successfully",
-            newUser
+            safeUser
         });
 
     } catch (error) {
